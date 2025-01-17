@@ -1,0 +1,22 @@
+jwt:
+  secret: changemeafterdeploysecretkey1234567891011121314151617181920212223242252627282930
+  lifetime: 30m
+  refresh_lifetime: 30d
+spring:
+  application:
+    name: nic-shop-task
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nic_shop
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql

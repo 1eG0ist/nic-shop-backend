@@ -15,9 +15,11 @@ public class ProductComment {
     private Long id;
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime createdDate;
-    @OneToOne(mappedBy = "userId", orphanRemoval = true)
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
-    @OneToOne(mappedBy = "productId", orphanRemoval = true)
+    @OneToOne
+    @JoinColumn(name = "product_id")
     private Product product;
     private Integer rating;
     @Column(length = 4055)
