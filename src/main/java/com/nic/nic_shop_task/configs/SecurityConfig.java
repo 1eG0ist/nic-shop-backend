@@ -33,16 +33,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .antMatcher("/api/**")
+                .antMatcher("/")
                 .authorizeRequests(authorizeRequests -> authorizeRequests
-                        .antMatchers("/api/v1/dialogs/**").hasRole("USER")
-                        .antMatchers("/api/v1/users/**").hasRole("USER")
-                        .antMatchers("/api/v1/files/**").hasRole("USER")
-                        .antMatchers("/api/v1/trainings/**").hasRole("USER")
-                        .antMatchers("/api/v1/user_trainings/**").hasRole("USER")
-                        .antMatchers("/api/v1/news/**").hasRole("USER")
-                        .antMatchers("/api/v1/video/**").hasRole("USER")
-                        .antMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic
