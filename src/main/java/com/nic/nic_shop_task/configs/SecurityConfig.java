@@ -33,8 +33,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .antMatcher("/")
-                .authorizeRequests(authorizeRequests -> authorizeRequests
+                .authorizeHttpRequests(rmr -> rmr
+                        .antMatchers("/orders/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic

@@ -18,19 +18,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> getCategoriesTreeS() {
-        try {
-            List<Category> rootCategories = categoryRepository.findRootCategories();
+    public ResponseEntity<List<Category>> getCategoriesTreeS() {
+        List<Category> rootCategories = categoryRepository.findRootCategories();
 
-            //TODO recursive is a bad practice, rework in future with native sql queries
-            for (Category rootCategory : rootCategories) {
-                fillChildren(rootCategory);
-            }
-
-            return ResponseEntity.ok(rootCategories);
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        //TODO recursive is a bad practice, rework in future with native sql queries
+        for (Category rootCategory : rootCategories) {
+            fillChildren(rootCategory);
         }
+
+        return ResponseEntity.ok(rootCategories);
     }
 
     // recursive finding child categories

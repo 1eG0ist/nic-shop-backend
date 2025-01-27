@@ -1,5 +1,6 @@
 package com.nic.nic_shop_task.services.Impl;
 
+import com.nic.nic_shop_task.dtos.CellWithOutOrderDto;
 import com.nic.nic_shop_task.models.Product;
 import com.nic.nic_shop_task.repositories.CategoryRepository;
 import com.nic.nic_shop_task.repositories.ProductRepository;
@@ -13,13 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @AllArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+
     @Override
     public ResponseEntity<?> getProductsS(Long categoryId, String sortBy, Integer page) {
         try {
@@ -57,5 +61,42 @@ public class ProductServiceImpl implements ProductService {
         } catch (Exception ex) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Override
+    public ResponseEntity<Integer> checkProductsCountS(Long productId) {
+        Integer count = productRepository.findById(productId)
+                .map(Product::getCount)
+                .orElseThrow(() -> new NoSuchElementException("Product not found with id: " + productId));
+
+        return ResponseEntity.ok(count);
+    }
+
+    @Transactional
+    public void checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells) throws NoSuchElementException, IllegalArgumentException {
+        for (CellWithOutOrderDto cell : cells) {
+            Product product = productRepository.findById(cell.getProductId())
+                    .orElseThrow(() -> new NoSuchElementException(String.format("Product not found with id %d ", cell.getProductId())));
+
+            if (product.getCount() == 0) {
+                throw new IllegalArgumentException(String.format("No product %s with an id %d in the warehouses",
+                        product.getName(),
+                        product.getId()));
+            } else if (product.getCount() < cell.getCount()) {
+                throw new IllegalArgumentException(String.format(
+                        "Have only %d products %s out of %d",
+                        product.getCount(),
+                        product.getName(),
+                        cell.getCount()));
+            }
+
+            product.setCount(product.getCount() - cell.getCount());
+            productRepository.save(product);
+        }
+    }
+
+    @Override
+    public List<Product> getProductsByIds(List<Long> ids) {
+        return productRepository.findProductsByIds(ids);
     }
 }

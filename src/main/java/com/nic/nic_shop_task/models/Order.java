@@ -1,22 +1,27 @@
 package com.nic.nic_shop_task.models;
 
 import javax.persistence.*;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import java.util.Date;
+import lombok.NoArgsConstructor;
+
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "orders")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "order_date")
-    private Date orderDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE", name = "order_date")
+    private ZonedDateTime orderDate;
 
     @Column(name = "user_id")
     private Long userId;
