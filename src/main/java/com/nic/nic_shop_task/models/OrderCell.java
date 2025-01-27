@@ -1,11 +1,16 @@
 package com.nic.nic_shop_task.models;
 
 import javax.persistence.*;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "order_cells")
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderCell {
 
     @Id

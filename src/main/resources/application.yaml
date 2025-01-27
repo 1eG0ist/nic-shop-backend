@@ -2,6 +2,8 @@ jwt:
   secret: changemeafterdeploysecretkey1234567891011121314151617181920212223242252627282930
   lifetime: 30m
   refresh_lifetime: 30d
+server:
+  port: 8080
 spring:
   application:
     name: nic-shop-task
@@ -24,3 +26,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: officialsportgram@gmail.com
+    password: "vipl idnr huuo fogv"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+  profiles:
+    active: default
