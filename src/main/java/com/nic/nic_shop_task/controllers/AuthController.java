@@ -22,7 +22,7 @@ public class AuthController {
         return authService.authTokensForLogin(authRequest);
     }
 
-    @PostMapping("/refreshToken")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> createTokensByRefreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDTO){
         return authService.createTokensByRefreshToken(refreshTokenRequestDTO.getRefreshToken());
     }
