@@ -27,7 +27,7 @@ public class DataInitializer implements CommandLineRunner {
             "стеклом.";
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         initializeRoles();
         initializeMinimalData();
     }
@@ -62,7 +62,7 @@ public class DataInitializer implements CommandLineRunner {
                 DEFAULT_DESCRIPTION,
                 115999.0,
                 6,
-                "app/images/products/iphone14.png",
+                "/app/images/products/iphone14.png",
                 10,
                 Collections.singletonList(apple)
         );
@@ -72,7 +72,7 @@ public class DataInitializer implements CommandLineRunner {
                 DEFAULT_DESCRIPTION,
                 80999.0,
                 4,
-                "app/images/products/iphone13.png",
+                "/app/images/products/iphone13.png",
                 15,
                 Collections.singletonList(apple)
         );
@@ -82,7 +82,7 @@ public class DataInitializer implements CommandLineRunner {
                 DEFAULT_DESCRIPTION,
                 59999.0,
                 0,
-                "app/images/products/samsunggalaxys8.png",
+                "/app/images/products/samsunggalaxys8.png",
                 15,
                 Collections.singletonList(samsung)
         );
@@ -92,7 +92,7 @@ public class DataInitializer implements CommandLineRunner {
                 DEFAULT_DESCRIPTION,
                 59999.0,
                 0,
-                "app/images/products/huaweip50.png",
+                "/app/images/products/huaweip50.png",
                 20,
                 Collections.singletonList(smartphones)
         );
@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner {
                 "Супер мега крутая колонка, такой ни у кого нет.",
                 23999.0,
                 3,
-                "app/images/products/yandexstation.png",
+                "/app/images/products/yandexstation.png",
                 0,
                 Collections.singletonList(audioTech)
         );
@@ -112,7 +112,7 @@ public class DataInitializer implements CommandLineRunner {
                 "Ну эти наушники - это база, такие у каждого быть должны (у меня нет)",
                 19999.0,
                 12,
-                "app/images/products/appleairpodspro.png",
+                "/app/images/products/appleairpodspro.png",
                 15,
                 Collections.singletonList(audioTech)
         );
