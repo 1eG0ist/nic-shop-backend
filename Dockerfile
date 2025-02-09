@@ -9,12 +9,13 @@ COPY . .
 
 # Создаем директории для хранения изображений
 RUN mkdir -p /app/images/products
+RUN mkdir -p /app/images/comments
 
 # Копируем изображения продуктов в контейнер
 COPY src/main/resources/images/products /app/images/products
 
 # Устанавливаем переменную окружения для пути к изображениям
-ENV IMAGE_PATH=/app/images/products
+ENV IMAGE_PATH=/app/images/
 
 # Сборка приложения с использованием Maven
 RUN mvn clean package
@@ -29,7 +30,7 @@ WORKDIR /app
 COPY --from=build /app/target/nic-shop-task-0.0.1-SNAPSHOT.jar /app/nic-shop-task.jar
 
 # Копируем изображения продуктов в контейнер
-COPY --from=build /app/images/products /app/images/products
+COPY --from=build /app/images/ /app/images/
 
 # Запускаем приложение
 CMD ["java", "-jar", "/app/nic-shop-task.jar"]
