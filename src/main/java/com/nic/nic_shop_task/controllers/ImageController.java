@@ -17,12 +17,11 @@ public class ImageController {
 
     @GetMapping()
     public ResponseEntity<InputStreamResource> downloadFile(@RequestParam("path") String path) {
-        System.out.println(path);
         return imageService.downloadFile(path);
     }
 
-    @PostMapping()
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, String category) {
+    @PostMapping("/{category}")
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("category") String category) {
         return imageService.uploadFile(file, category);
     }
 
