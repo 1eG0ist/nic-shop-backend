@@ -2,6 +2,7 @@ package com.nic.nic_shop_task.services.Impl;
 
 import com.nic.nic_shop_task.models.ProductComment;
 import com.nic.nic_shop_task.repositories.ProductCommentRepository;
+import com.nic.nic_shop_task.repositories.UserRepository;
 import com.nic.nic_shop_task.services.ImageService;
 import com.nic.nic_shop_task.services.ProductCommentService;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Optional;
 
 
 @Service
@@ -22,6 +24,7 @@ import java.util.Collections;
 public class ProductCommentServiceImpl implements ProductCommentService {
     private final ProductCommentRepository productCommentRepository;
     private final ImageService imageService;
+    private final UserRepository userRepository;
 
     @Override
     public ResponseEntity<?> createProductComment(ProductComment productComment) {
@@ -36,6 +39,8 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             if (!hasUserRole) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
+            Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+            productComment.setUser(userRepository.findUserById(userId).get());
             productComment.setCreatedDate(ZonedDateTime.now());
             return ResponseEntity.ok(productCommentRepository.save(productComment));
         } catch (Exception e) {
@@ -57,12 +62,15 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public ResponseEntity<?> deleteProductCommentById(Long productCommentId) {
         try {
-            if (!isAdmin()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+            if (!isAdmin()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
-            String path = productCommentRepository.deleteByIdWithReturning(productCommentId);
-            imageService.deleteFiles(Collections.singletonList(path));
+            Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
+            if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            String path = comment.get().getImagePath();
+            productCommentRepository.delete(comment.get());
+            if (path != null) {
+                imageService.deleteFiles(Collections.singletonList(path));
+            }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -72,12 +80,16 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public ResponseEntity<?> deleteProductCommentImageByProductId(Long productCommentId) {
         try {
-            if (!isAdmin()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+            if (!isAdmin()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 
-            String imagePathToDelete = productCommentRepository.deleteImageById(productCommentId);
-            imageService.deleteFiles(Collections.singletonList(imagePathToDelete));
+            Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
+            if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            String path = comment.get().getImagePath();
+            comment.get().setImagePath(null);
+            productCommentRepository.save(comment.get());
+            if (path != null) {
+                imageService.deleteFiles(Collections.singletonList(path));
+            }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

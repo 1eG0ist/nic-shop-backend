@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("product_comments")
+@RequestMapping("/product_comments")
 @RequiredArgsConstructor
 public class ProductCommentController {
     private final ProductCommentService productCommentService;
