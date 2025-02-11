@@ -31,9 +31,6 @@ public class ProductServiceImpl implements ProductService {
             List<Long> categories = categoryRepository.findAllSubCategoryIds(categoryId);
             sortBy = sortBy == null ? "null" : sortBy.toLowerCase();
             switch (sortBy) {
-                case "null":
-                    sort = Sort.by(Sort.Direction.ASC, "id");
-                    break;
                 case "asc":
                     sort = Sort.by(Sort.Direction.ASC, "price");
                     break;
@@ -41,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
                     sort = Sort.by(Sort.Direction.DESC, "price");
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid sortBy value: " + sortBy);
+                    sort = Sort.by(Sort.Direction.ASC, "id");
             }
 
             Pageable pageable = PageRequest.of(page, 10, sort);

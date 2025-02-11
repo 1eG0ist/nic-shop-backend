@@ -25,7 +25,7 @@ public class ProductController {
     @GetMapping("/by_category")
     public ResponseEntity<?> getProducts(
             @RequestParam("id") Long categoryId,
-            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "sort", defaultValue = "asc") String sort,
             @RequestParam("page") Integer page) {
         return productService.getProductsS(categoryId, sort, page);
     }
