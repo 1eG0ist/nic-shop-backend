@@ -12,6 +12,14 @@ public interface ProductService {
     ResponseEntity<Product> getProductS(Long productId);
 
     ResponseEntity<Integer> checkProductsCountS(Long productId);
+
     void checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells);
+
     List<Product> getProductsByIds(List<Long> ids);
+
+    ResponseEntity<?> createProductS(Product product);
+
+    ResponseEntity<?> updateProductS(Product product);
+
+    ResponseEntity<?> deleteProduct(Long id);
 }

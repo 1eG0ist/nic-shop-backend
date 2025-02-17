@@ -4,4 +4,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface CategoryService {
     ResponseEntity<?> getCategoriesTreeS();
+    ResponseEntity<?> getDefaultCategories();
 }
