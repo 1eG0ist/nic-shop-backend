@@ -40,6 +40,21 @@ public class ProductController {
         return productService.checkProductsCountS(productId);
     }
 
+    @PostMapping
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
+        return productService.createProductS(product);
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> updateProduct(@RequestBody Product product) {
+        return productService.updateProductS(product);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteProduct(@RequestParam("id") Long id) {
+        return productService.deleteProduct(id);
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ErrorDetail> handleNoSuchElementException(NoSuchElementException exception, Locale locale) {
         String title = messageSource.getMessage("errors.404.title", new Object[0], "errors.404.title", locale);

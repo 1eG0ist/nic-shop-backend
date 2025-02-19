@@ -19,4 +19,9 @@ public class CategoryController {
         return categoryService.getCategoriesTreeS();
     }
 
+    @GetMapping("/default")
+    public ResponseEntity<?> getCategories() {
+        return categoryService.getDefaultCategories();
+    }
+
 }

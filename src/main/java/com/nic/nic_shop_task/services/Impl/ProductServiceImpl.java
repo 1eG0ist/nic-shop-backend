@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -95,5 +97,54 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getProductsByIds(List<Long> ids) {
         return productRepository.findProductsByIds(ids);
+    }
+
+    @Transactional
+    @Modifying
+    @Override
+    public ResponseEntity<?> createProductS(Product product) {
+        boolean notAdmin = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .noneMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (notAdmin) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        return ResponseEntity.ok().body(productRepository.save(product));
+    }
+
+    @Transactional
+    @Modifying
+    @Override
+    public ResponseEntity<?> updateProductS(Product product) {
+        boolean notAdmin = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .noneMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (notAdmin) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        return ResponseEntity.ok().body(productRepository.save(product));
+    }
+
+    @Transactional
+    @Modifying
+    @Override
+    public ResponseEntity<?> deleteProduct(Long id) {
+        boolean notAdmin = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .noneMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+        if (notAdmin) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        productRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

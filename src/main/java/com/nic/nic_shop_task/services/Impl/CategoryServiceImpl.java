@@ -27,6 +27,11 @@ public class CategoryServiceImpl implements CategoryService {
         return ResponseEntity.ok(rootCategories);
     }
 
+    @Override
+    public ResponseEntity<?> getDefaultCategories() {
+        return ResponseEntity.ok(categoryRepository.findAll());
+    }
+
     // recursive finding child categories
     private void fillChildren(Category category) {
         List<Category> children = categoryRepository.findChildrenByParentIdWithOutParent(category.getId());
