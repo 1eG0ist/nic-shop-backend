@@ -62,8 +62,6 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public ResponseEntity<?> deleteProductCommentById(Long productCommentId) {
         try {
-            if (!isAdmin()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-
             Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
             if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             String path = comment.get().getImagePath();
@@ -80,8 +78,6 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     @Override
     public ResponseEntity<?> deleteProductCommentImageByProductId(Long productCommentId) {
         try {
-            if (!isAdmin()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-
             Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
             if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             String path = comment.get().getImagePath();
@@ -94,15 +90,5 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-
-    boolean isAdmin() {
-        return SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getAuthorities()
-                .stream()
-                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
-
     }
 }

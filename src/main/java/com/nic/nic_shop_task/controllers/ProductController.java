@@ -40,17 +40,17 @@ public class ProductController {
         return productService.checkProductsCountS(productId);
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     public ResponseEntity<?> createProduct(@RequestBody Product product) {
         return productService.createProductS(product);
     }
 
-    @PatchMapping
+    @PatchMapping("/admin")
     public ResponseEntity<?> updateProduct(@RequestBody Product product) {
         return productService.updateProductS(product);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/admin")
     public ResponseEntity<?> deleteProduct(@RequestParam("id") Long id) {
         return productService.deleteProduct(id);
     }

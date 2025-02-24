@@ -4,6 +4,7 @@ import com.nic.nic_shop_task.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p FROM Product p WHERE p.id IN :ids")
     List<Product> findProductsByIds(List<Long> ids);
+
+    @Modifying
+    @Query(value = "DELETE FROM product_categories WHERE category_id = :categoryId", nativeQuery = true)
+    void deleteCategoryFromProducts(@Param("categoryId") Long categoryId);
+
+    @Modifying
+    @Query(value = "UPDATE product_categories pc SET category_id = :newCategoryId WHERE category_id = :categoryId", nativeQuery = true)
+    void swapCategoryToDeletedCategoryParent(@Param("categoryId") Long categoryId, @Param("newCategoryId") Long newCategoryId);
 }

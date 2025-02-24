@@ -34,6 +34,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(rmr -> rmr
+                        .antMatchers("/categories/admin").hasRole("ADMIN")
+                        .antMatchers("/products/admin").hasRole("ADMIN")
+                        .antMatchers("/product_comments/admin").hasRole("ADMIN")
+                        .antMatchers("/product_comments").hasRole("USER")
+                        .antMatchers("/product_comments/all").permitAll()
                         .antMatchers("/orders/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )

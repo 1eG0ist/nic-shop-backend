@@ -17,7 +17,7 @@ public class ProductCommentController {
         return productCommentService.createProductComment(productComment);
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<?> getProductCommentsByProductId(
             @RequestParam("id") Long productId,
             @RequestParam(value = "minRating", defaultValue = "1") Integer minRating,
@@ -26,12 +26,12 @@ public class ProductCommentController {
         return productCommentService.getProductCommentsByProductId(productId, minRating, maxRating, page);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/admin")
     public ResponseEntity<?> deleteProductCommentById(@RequestParam("id") Long productCommentId) {
         return productCommentService.deleteProductCommentById(productCommentId);
     }
 
-    @DeleteMapping("/image")
+    @DeleteMapping("/admin/image")
     public ResponseEntity<?> deleteProductCommentImageByProductId(@RequestParam("id") Long productCommentId) {
         return productCommentService.deleteProductCommentImageByProductId(productCommentId);
     }
