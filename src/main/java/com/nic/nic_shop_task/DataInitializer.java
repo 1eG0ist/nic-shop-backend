@@ -1,11 +1,7 @@
 package com.nic.nic_shop_task;
 
-import com.nic.nic_shop_task.models.Category;
-import com.nic.nic_shop_task.models.Product;
-import com.nic.nic_shop_task.models.Role;
-import com.nic.nic_shop_task.repositories.CategoryRepository;
-import com.nic.nic_shop_task.repositories.ProductRepository;
-import com.nic.nic_shop_task.repositories.RoleRepository;
+import com.nic.nic_shop_task.models.*;
+import com.nic.nic_shop_task.repositories.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -19,6 +15,8 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final ProductPropertiesRepository productPropertiesRepository;
+    private final PropertyRepository propertyRepository;
 
     private final String DEFAULT_DESCRIPTION = "В этой модели установлены три основные камеры (48 Мп, 12" +
             "Мп и 12 Мп) и фронтальный модуль (7 Мп), можно записывать " +
@@ -49,7 +47,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initializeMinimalData() {
         // Создание корневых категорий
-
         Category smartphones = createCategory("Смартфоны", null);
         Category audioTech = createCategory("Аудиотехника", null);
 
@@ -57,7 +54,8 @@ public class DataInitializer implements CommandLineRunner {
         Category apple = createCategory("Apple", smartphones);
         Category samsung = createCategory("Samsung", smartphones);
 
-        createProduct(
+        // Создание продуктов и их свойств
+        Product iphone14 = createProduct(
                 "Смартфон Apple iPhone 14",
                 DEFAULT_DESCRIPTION,
                 115999.0,
@@ -66,8 +64,13 @@ public class DataInitializer implements CommandLineRunner {
                 10,
                 Collections.singletonList(apple)
         );
+        addProductProperty(iphone14, "Количество ядер", "number", 6.0);
+        addProductProperty(iphone14, "Диагональ экрана", "number", 6.1);
+        addProductProperty(iphone14, "Цвет", "text", "Черный");
+        addProductProperty(iphone14, "Наличие чехла", "boolean", true);
+        addProductProperty(iphone14, "Объем памяти", "number", 128.0);
 
-        createProduct(
+        Product iphone13 = createProduct(
                 "Смартфон Apple iPhone 13",
                 DEFAULT_DESCRIPTION,
                 80999.0,
@@ -76,8 +79,13 @@ public class DataInitializer implements CommandLineRunner {
                 15,
                 Collections.singletonList(apple)
         );
+        addProductProperty(iphone13, "Количество ядер", "number", 4.0);
+        addProductProperty(iphone13, "Диагональ экрана", "number", 6.1);
+        addProductProperty(iphone13, "Цвет", "text", "Синий");
+        addProductProperty(iphone13, "Наличие чехла", "boolean", false);
+        addProductProperty(iphone13, "Объем памяти", "number", 64.0);
 
-        createProduct(
+        Product galaxyS8 = createProduct(
                 "Смартфон Samsung Galaxy S8",
                 DEFAULT_DESCRIPTION,
                 59999.0,
@@ -86,9 +94,14 @@ public class DataInitializer implements CommandLineRunner {
                 15,
                 Collections.singletonList(samsung)
         );
+        addProductProperty(galaxyS8, "Количество ядер", "number", 8.0);
+        addProductProperty(galaxyS8, "Диагональ экрана", "number", 6.2);
+        addProductProperty(galaxyS8, "Цвет", "text", "Черный");
+        addProductProperty(galaxyS8, "Наличие чехла", "boolean", true);
+        addProductProperty(galaxyS8, "Объем памяти", "number", 128.0);
 
-        createProduct(
-                "Смартфон Huawei P50 ",
+        Product huaweiP50 = createProduct(
+                "Смартфон Huawei P50",
                 DEFAULT_DESCRIPTION,
                 59999.0,
                 0,
@@ -96,8 +109,13 @@ public class DataInitializer implements CommandLineRunner {
                 20,
                 Collections.singletonList(smartphones)
         );
+        addProductProperty(huaweiP50, "Количество ядер", "number", 8.0);
+        addProductProperty(huaweiP50, "Диагональ экрана", "number", 6.5);
+        addProductProperty(huaweiP50, "Цвет", "text", "Золотой");
+        addProductProperty(huaweiP50, "Наличие чехла", "boolean", false);
+        addProductProperty(huaweiP50, "Объем памяти", "number", 256.0);
 
-        createProduct(
+        Product yandexStation = createProduct(
                 "Умная колонка Яндекс Станция",
                 "Супер мега крутая колонка, такой ни у кого нет.",
                 23999.0,
@@ -106,8 +124,9 @@ public class DataInitializer implements CommandLineRunner {
                 0,
                 Collections.singletonList(audioTech)
         );
+        addProductProperty(yandexStation, "Цвет", "text", "Черный");
 
-        createProduct(
+        Product airPodsPro = createProduct(
                 "Наушники Apple AirPods Pro",
                 "Ну эти наушники - это база, такие у каждого быть должны (у меня нет)",
                 19999.0,
@@ -116,6 +135,30 @@ public class DataInitializer implements CommandLineRunner {
                 15,
                 Collections.singletonList(audioTech)
         );
+        addProductProperty(airPodsPro, "Цвет", "text", "Белый");
+    }
+
+    private void addProductProperty(Product product, String propertyName, String propertyType, Object value) {
+        Property property = propertyRepository.findByName(propertyName)
+                .orElseGet(() -> propertyRepository.save(new Property(null, propertyName, propertyType)));
+
+        ProductProperties productProperty = new ProductProperties();
+        productProperty.setProduct(product);
+        productProperty.setProperty(property);
+
+        switch (propertyType) {
+            case "number":
+                productProperty.setNumericValue((Double) value);
+                break;
+            case "text":
+                productProperty.setTextValue((String) value);
+                break;
+            case "boolean":
+                productProperty.setIsValue((Boolean) value);
+                break;
+        }
+
+        productPropertiesRepository.save(productProperty);
     }
 
     private Category createCategory(String name, Category parentCategory) {
@@ -124,10 +167,10 @@ public class DataInitializer implements CommandLineRunner {
         );
     }
 
-    private void createProduct(String name, String description, Double price, Integer count,
+    private Product createProduct(String name, String description, Double price, Integer count,
          String ImagePath, Integer sale, List<Category> categories) {
 
-        productRepository.save(new Product(null, name, description, price, count,
+        return productRepository.save(new Product(null, name, description, price, count,
                 ImagePath, sale, categories));
 
     }

@@ -20,8 +20,7 @@ public class ProductProperties {
     @JoinColumn(name = "property_id")
     private Property property;
 
-    private String name;
-    private Double valueValue;
+    private Double numericValue;
     private Double rangeStartValue;
     private Double rangeEndValue;
     private Boolean isValue;

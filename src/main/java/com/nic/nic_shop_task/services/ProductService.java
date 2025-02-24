@@ -1,13 +1,14 @@
 package com.nic.nic_shop_task.services;
 
 import com.nic.nic_shop_task.dtos.CellWithOutOrderDto;
+import com.nic.nic_shop_task.dtos.FilterPropertyDto;
 import com.nic.nic_shop_task.models.Product;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface ProductService {
-    ResponseEntity<?> getProductsS(Long categoryId, String sort, Integer page);
+    ResponseEntity<?> getProductsS(Long categoryId, String sort, Integer page, List<FilterPropertyDto> filterProperties);
 
     ResponseEntity<Product> getProductS(Long productId);
 

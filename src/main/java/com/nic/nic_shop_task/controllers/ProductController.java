@@ -1,6 +1,7 @@
 package com.nic.nic_shop_task.controllers;
 
 import com.nic.nic_shop_task.dtos.Errors.ErrorDetail;
+import com.nic.nic_shop_task.dtos.FilterPropertyDto;
 import com.nic.nic_shop_task.models.Product;
 import com.nic.nic_shop_task.services.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -9,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,12 +21,17 @@ public class ProductController {
 
     private final MessageSource messageSource;
 
-    @GetMapping("/by_category")
+    @PostMapping("/by_category")
     public ResponseEntity<?> getProducts(
             @RequestParam("id") Long categoryId,
             @RequestParam(value = "sort", defaultValue = "asc") String sort,
-            @RequestParam("page") Integer page) {
-        return productService.getProductsS(categoryId, sort, page);
+            @RequestParam("page") Integer page,
+            @RequestBody(required = false) List<FilterPropertyDto> filterProperties) {
+        return productService.getProductsS(
+                categoryId,
+                sort,
+                page,
+                filterProperties == null ? new ArrayList<>() : filterProperties);
     }
 
     @GetMapping

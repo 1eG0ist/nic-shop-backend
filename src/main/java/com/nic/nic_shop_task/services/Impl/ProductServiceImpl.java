@@ -1,15 +1,13 @@
 package com.nic.nic_shop_task.services.Impl;
 
 import com.nic.nic_shop_task.dtos.CellWithOutOrderDto;
+import com.nic.nic_shop_task.dtos.FilterPropertyDto;
 import com.nic.nic_shop_task.models.Product;
 import com.nic.nic_shop_task.repositories.CategoryRepository;
 import com.nic.nic_shop_task.repositories.ProductRepository;
 import com.nic.nic_shop_task.services.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public ResponseEntity<?> getProductsS(Long categoryId, String sortBy, Integer page) {
+    public ResponseEntity<?> getProductsS(Long categoryId, String sortBy, Integer page, List<FilterPropertyDto> filterProperties) {
         try {
             Sort sort;
             List<Long> categories = categoryRepository.findAllSubCategoryIds(categoryId);
@@ -43,12 +41,21 @@ public class ProductServiceImpl implements ProductService {
             }
 
             Pageable pageable = PageRequest.of(page, 10, sort);
-            Page<Product> products = productRepository.findByCategoryIds(categories, pageable);
-            return ResponseEntity.ok(products);
+
+            // Фильтрация по категориям и свойствам
+            List<Product> filteredProducts = productRepository.findByCategoryIdsAndFilters(categories, filterProperties);
+
+            // Пагинация
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), filteredProducts.size());
+            Page<Product> productsPage = new PageImpl<>(filteredProducts.subList(start, end), pageable, filteredProducts.size());
+
+            return ResponseEntity.ok(productsPage);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
 
     @Override
     public ResponseEntity<Product> getProductS(Long productId) {
