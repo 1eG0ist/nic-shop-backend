@@ -1,12 +1,16 @@
 package com.nic.nic_shop_task.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
 @Entity
 @Table(name = "product_properties")
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductProperties {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
