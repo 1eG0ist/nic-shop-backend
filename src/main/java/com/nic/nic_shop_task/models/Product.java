@@ -24,6 +24,9 @@ public class Product {
     private String imagePath;
     private Integer sale;
 
+    private Integer numberOfRatings = 0;
+    private Integer sumOfRatings = 0;
+
     @ManyToMany
     @JoinTable(
             name = "product_categories",

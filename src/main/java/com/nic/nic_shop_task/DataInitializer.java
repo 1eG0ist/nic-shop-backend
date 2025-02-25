@@ -171,7 +171,7 @@ public class DataInitializer implements CommandLineRunner {
          String ImagePath, Integer sale, List<Category> categories) {
 
         return productRepository.save(new Product(null, name, description, price, count,
-                ImagePath, sale, categories));
+                ImagePath, sale, 0, 0, categories));
 
     }
 }

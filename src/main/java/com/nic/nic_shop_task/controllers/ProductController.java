@@ -25,11 +25,15 @@ public class ProductController {
     public ResponseEntity<?> getProducts(
             @RequestParam("id") Long categoryId,
             @RequestParam(value = "sort", defaultValue = "asc") String sort,
+            @RequestParam(value = "minRating", defaultValue = "1") Double minRating,
+            @RequestParam(value = "maxRating", defaultValue = "1") Double maxRating,
             @RequestParam("page") Integer page,
             @RequestBody(required = false) List<FilterPropertyDto> filterProperties) {
         return productService.getProductsS(
                 categoryId,
                 sort,
+                minRating,
+                maxRating,
                 page,
                 filterProperties == null ? new ArrayList<>() : filterProperties);
     }

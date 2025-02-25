@@ -8,7 +8,13 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ProductService {
-    ResponseEntity<?> getProductsS(Long categoryId, String sort, Integer page, List<FilterPropertyDto> filterProperties);
+    ResponseEntity<?> getProductsS(
+            Long categoryId,
+            String sort,
+            Double minRating,
+            Double maxRating,
+            Integer page,
+            List<FilterPropertyDto> filterProperties);
 
     ResponseEntity<Product> getProductS(Long productId);
 

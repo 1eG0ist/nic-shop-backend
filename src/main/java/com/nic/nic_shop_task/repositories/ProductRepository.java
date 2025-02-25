@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -20,7 +21,11 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-    default List<Product> findByCategoryIdsAndFilters(List<Long> categoryIds, List<FilterPropertyDto> filters) {
+    default List<Product> findByCategoryIdsAndFilters(
+            List<Long> categoryIds,
+            Double minRating,
+            Double maxRating,
+            List<FilterPropertyDto> filters) {
         return findAll((Specification<Product>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -28,6 +33,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             if (categoryIds != null && !categoryIds.isEmpty()) {
                 predicates.add(root.join("categories").get("id").in(categoryIds));
             }
+
+            Expression<Double> ratingExpression = criteriaBuilder.selectCase()
+                    .when(criteriaBuilder.equal(root.get("numberOfRatings"), 0), criteriaBuilder.literal(1.0))
+                    .otherwise(criteriaBuilder.quot(
+                            root.get("sumOfRatings").as(Double.class),
+                            criteriaBuilder.selectCase()
+                                    .when(criteriaBuilder.equal(root.get("numberOfRatings"), 0), 1.0)
+                                    .otherwise(root.get("numberOfRatings")).as(Double.class)
+                    ).as(Double.class)).as(Double.class);
+
+            predicates.add(criteriaBuilder.between(ratingExpression, minRating, maxRating));
 
             // Фильтр по свойствам
             if (filters != null && !filters.isEmpty()) {
@@ -106,4 +122,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Modifying
     @Query(value = "UPDATE product_categories pc SET category_id = :newCategoryId WHERE category_id = :categoryId", nativeQuery = true)
     void swapCategoryToDeletedCategoryParent(@Param("categoryId") Long categoryId, @Param("newCategoryId") Long newCategoryId);
+
+    @Modifying
+    @Query(value = "UPDATE products " +
+            "SET sum_of_ratings = (sum_of_ratings + :rating), " +
+            "number_of_ratings = number_of_ratings + 1 " +
+            "WHERE id = :productId", nativeQuery = true)
+    void addRating(Long productId, Integer rating);
 }

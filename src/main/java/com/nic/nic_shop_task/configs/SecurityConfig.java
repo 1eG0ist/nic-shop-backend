@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .antMatchers("/product_comments/admin").hasRole("ADMIN")
                         .antMatchers("/product_comments").hasRole("USER")
                         .antMatchers("/product_comments/all").permitAll()
+                        .antMatchers("/product_properties/admin").hasRole("ADMIN")
+                        .antMatchers("/products/rating").hasRole("USER")
                         .antMatchers("/orders/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )

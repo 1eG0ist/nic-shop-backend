@@ -24,7 +24,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public ResponseEntity<?> getProductsS(Long categoryId, String sortBy, Integer page, List<FilterPropertyDto> filterProperties) {
+    public ResponseEntity<?> getProductsS(
+            Long categoryId,
+            String sortBy,
+            Double minRating,
+            Double maxRating,
+            Integer page,
+            List<FilterPropertyDto> filterProperties) {
         try {
             Sort sort;
             List<Long> categories = categoryRepository.findAllSubCategoryIds(categoryId);
@@ -43,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
             Pageable pageable = PageRequest.of(page, 10, sort);
 
             // Фильтрация по категориям и свойствам
-            List<Product> filteredProducts = productRepository.findByCategoryIdsAndFilters(categories, filterProperties);
+            List<Product> filteredProducts = productRepository.findByCategoryIdsAndFilters(categories, minRating, maxRating, filterProperties);
 
             // Пагинация
             int start = (int) pageable.getOffset();
