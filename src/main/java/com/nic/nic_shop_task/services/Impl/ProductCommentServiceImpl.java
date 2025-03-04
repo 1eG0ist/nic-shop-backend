@@ -27,18 +27,8 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseEntity<?> createProductComment(ProductComment productComment) {
+    public ResponseEntity<?> createProductCommentS(ProductComment productComment) {
         try {
-            boolean hasUserRole = SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getAuthorities()
-                    .stream()
-                    .anyMatch(role -> role.getAuthority().equals("ROLE_USER"));
-
-            if (!hasUserRole) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
             Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
             productComment.setUser(userRepository.findUserById(userId).get());
             productComment.setCreatedDate(ZonedDateTime.now());

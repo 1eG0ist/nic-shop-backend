@@ -14,7 +14,7 @@ public class ProductCommentController {
 
     @PostMapping()
     public ResponseEntity<?> createProductComment(@RequestBody ProductComment productComment) {
-        return productCommentService.createProductComment(productComment);
+        return productCommentService.createProductCommentS(productComment);
     }
 
     @GetMapping("/all")
