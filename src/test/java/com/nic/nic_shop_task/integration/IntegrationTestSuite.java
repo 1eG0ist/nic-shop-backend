@@ -7,8 +7,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @Suite
 @SuiteDisplayName("Integration Test Suite")
 @SelectClasses({
+        ProductIntegrationTest.class,
         AuthIntegrationTest.class,
-        ProductIntegrationTest.class
 })
 public class IntegrationTestSuite {
 }
