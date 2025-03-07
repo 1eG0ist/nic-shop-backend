@@ -9,7 +9,7 @@ public interface CategoryService {
 
     ResponseEntity<?> getDefaultCategoriesS();
 
-    ResponseEntity<?> createCategoryS(Category category);
+    ResponseEntity<Category> createCategoryS(Category category);
 
     ResponseEntity<?> updateCategoryS(UpdateCategoryDto category);
 

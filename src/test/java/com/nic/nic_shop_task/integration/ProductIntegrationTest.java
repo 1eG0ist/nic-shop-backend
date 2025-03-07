@@ -1,8 +1,6 @@
 package com.nic.nic_shop_task.integration;
 
 import com.nic.nic_shop_task.models.Product;
-import com.nic.nic_shop_task.models.User;
-import com.nic.nic_shop_task.repositories.UserRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,16 +21,15 @@ public class ProductIntegrationTest extends IntegrationTestBase {
     @Autowired
     protected TestRestTemplate restTemplate;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Test
     @Order(1)
-    void getProductById_ShouldReturnProduct() {
-        Optional<User> user = userRepository.findUserById(1L);
+    void checkDependentsOn() {
+        checkDependencies("ProductIntegrationTest", "AuthIntegrationTest");
+    }
 
-        System.out.println("~~~~1: " + user.isPresent());
-        if (user.isPresent()) System.out.println("~~~~1: " + user.get().getName());
+    @Test
+    @Order(2)
+    void getProductById_ShouldReturnProduct() {
         Long productId = 1L;
 
         // Выполняем GET-запрос к эндпоинту /products?id=1
@@ -53,7 +48,11 @@ public class ProductIntegrationTest extends IntegrationTestBase {
 
         // Проверяем, что ID продукта соответствует запрошенному
         assertEquals(productId, product.getId());
-        System.out.println(product.getName());
-        System.out.println("~~~: " + adminJwtToken);
+    }
+
+    @Test
+    @Order(100)
+    void onEnd() {
+        dependencyStatus.put("ProductIntegrationTest", true);
     }
 }

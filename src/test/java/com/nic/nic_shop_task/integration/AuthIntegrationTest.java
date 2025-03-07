@@ -78,5 +78,12 @@ public class AuthIntegrationTest extends IntegrationTestBase {
         assertNotNull(response.getBody());
 
         adminJwtToken = response.getBody().getAccessToken();
+        httpHeaders.set("Authorization", "Bearer " + response.getBody().getAccessToken());
+    }
+
+    @Test
+    @Order(100)
+    void onEnd() {
+        dependencyStatus.put("AuthIntegrationTest", true);
     }
 }

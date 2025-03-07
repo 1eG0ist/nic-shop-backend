@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> createCategoryS(Category category) {
+    public ResponseEntity<Category> createCategoryS(Category category) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryRepository.save(category));
     }
 
