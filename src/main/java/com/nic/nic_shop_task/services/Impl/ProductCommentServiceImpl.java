@@ -1,7 +1,10 @@
 package com.nic.nic_shop_task.services.Impl;
 
+import com.nic.nic_shop_task.dtos.CreateProductCommentDto;
+import com.nic.nic_shop_task.models.Product;
 import com.nic.nic_shop_task.models.ProductComment;
 import com.nic.nic_shop_task.repositories.ProductCommentRepository;
+import com.nic.nic_shop_task.repositories.ProductRepository;
 import com.nic.nic_shop_task.repositories.UserRepository;
 import com.nic.nic_shop_task.services.ImageService;
 import com.nic.nic_shop_task.services.ProductCommentService;
@@ -25,13 +28,24 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     private final ProductCommentRepository productCommentRepository;
     private final ImageService imageService;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Override
-    public ResponseEntity<?> createProductCommentS(ProductComment productComment) {
+    public ResponseEntity<?> createProductCommentS(CreateProductCommentDto createProductCommentDto) {
         try {
             Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            Optional<Product> product = productRepository.findById(createProductCommentDto.getProductId());
+            if (!product.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            ProductComment productComment = new ProductComment();
+            productComment.setProduct(product.get());
             productComment.setUser(userRepository.findUserById(userId).get());
             productComment.setCreatedDate(ZonedDateTime.now());
+            productComment.setComment(createProductCommentDto.getComment());
+            productComment.setRating(createProductCommentDto.getRating());
+            productComment.setImagePath(createProductCommentDto.getImagePath());
             return ResponseEntity.ok(productCommentRepository.save(productComment));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

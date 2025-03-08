@@ -1,12 +1,9 @@
 package com.nic.nic_shop_task.controllers;
 
-import com.nic.nic_shop_task.dtos.Errors.ErrorDetail;
 import com.nic.nic_shop_task.dtos.FilterPropertyDto;
 import com.nic.nic_shop_task.models.Product;
 import com.nic.nic_shop_task.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +15,6 @@ import java.util.*;
 public class ProductController {
 
     private final ProductService productService;
-
-    private final MessageSource messageSource;
 
     @PostMapping("/by_category")
     public ResponseEntity<?> getProducts(
@@ -61,15 +56,5 @@ public class ProductController {
     @DeleteMapping("/admin")
     public ResponseEntity<?> deleteProduct(@RequestParam("id") Long id) {
         return productService.deleteProduct(id);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorDetail> handleNoSuchElementException(NoSuchElementException exception, Locale locale) {
-        String title = messageSource.getMessage("errors.404.title", new Object[0], "errors.404.title", locale);
-        String detail = messageSource.getMessage(exception.getMessage(), new Object[0], exception.getMessage(), locale);
-
-        ErrorDetail errorDetail = new ErrorDetail(title, HttpStatus.NOT_FOUND.value(), detail, Collections.emptyList());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetail);
     }
 }

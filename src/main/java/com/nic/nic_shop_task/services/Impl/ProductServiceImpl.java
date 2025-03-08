@@ -118,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
     @Modifying
     @Override
     public ResponseEntity<?> createProductS(Product product) {
-        return ResponseEntity.ok().body(productRepository.save(product));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(product));
     }
 
     @Transactional

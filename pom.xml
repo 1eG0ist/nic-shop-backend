@@ -105,6 +105,11 @@
 			<version>1.9.2</version> <!-- Убедитесь, что версия совместима с вашим JUnit 5 -->
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.4.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -142,9 +147,13 @@
 				<configuration>
 					<testFailureIgnore>false</testFailureIgnore>
 					<includes>
+						<include>**/AuthIntegrationTest.class</include>
 						<include>**/CategoryIntegrationTest.class</include>
 						<include>**/ProductIntegrationTest.class</include>
-						<include>**/AuthIntegrationTest.class</include>
+						<include>**/OrderIntegrationTest.class</include>
+						<include>**/ProductCommentIntegrationTest.class</include>
+						<include>**/ProductPropertiesIntegrationTest.class</include>
+						<include>**/ProductRatingIntegrationTest.class</include>
 					</includes>
 				</configuration>
 			</plugin>

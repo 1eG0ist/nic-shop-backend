@@ -47,7 +47,9 @@ public class ProductPropertiesServiceImpl implements ProductPropertiesService {
                 productPropertyDto.getTextValue()
         );
 
-        return ResponseEntity.ok(productPropertiesRepository.save(productProperties));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productPropertiesRepository.save(productProperties));
     }
 
     @Override

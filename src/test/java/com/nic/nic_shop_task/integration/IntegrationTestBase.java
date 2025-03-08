@@ -6,6 +6,7 @@ import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -22,7 +23,7 @@ import java.util.Map;
 public abstract class IntegrationTestBase {
 
     protected static String adminJwtToken;
-    protected static HttpHeaders httpHeaders;
+    protected static HttpHeaders httpHeaders = new HttpHeaders();
 
     /*
     * TestNg не ожидает запуска docker postgres контейнера, JUnit меньше подходит для интеграционных тестов, т.к. нет
@@ -32,6 +33,9 @@ public abstract class IntegrationTestBase {
         put("AuthIntegrationTest", false);
         put("CategoryIntegrationTest", false);
         put("ProductIntegrationTest", false);
+        put("OrderIntegrationTest", false);
+        put("ProductCommentIntegrationTest", false);
+        put("ProductRatingIntegrationTest", false);
     }};
 
     protected static void checkDependencies(String currentClassName, String dependencyClassName) {
