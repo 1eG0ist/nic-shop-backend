@@ -1,6 +1,6 @@
 package com.nic.nic_shop_task.controllers;
 
-import com.nic.nic_shop_task.models.ProductComment;
+import com.nic.nic_shop_task.dtos.CreateProductCommentDto;
 import com.nic.nic_shop_task.services.ProductCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +13,8 @@ public class ProductCommentController {
     private final ProductCommentService productCommentService;
 
     @PostMapping()
-    public ResponseEntity<?> createProductComment(@RequestBody ProductComment productComment) {
-        return productCommentService.createProductComment(productComment);
+    public ResponseEntity<?> createProductComment(@RequestBody CreateProductCommentDto createProductCommentDto) {
+        return productCommentService.createProductCommentS(createProductCommentDto);
     }
 
     @GetMapping("/all")

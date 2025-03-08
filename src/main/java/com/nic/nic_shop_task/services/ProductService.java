@@ -20,7 +20,7 @@ public interface ProductService {
 
     ResponseEntity<Integer> checkProductsCountS(Long productId);
 
-    void checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells);
+    ResponseEntity<?> checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells);
 
     List<Product> getProductsByIds(List<Long> ids);
 

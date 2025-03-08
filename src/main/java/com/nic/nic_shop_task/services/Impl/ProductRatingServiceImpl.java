@@ -24,6 +24,6 @@ public class ProductRatingServiceImpl implements ProductRatingService {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         productRatingRepository.saveNewRating(userId, productRatingDto.getProductId(), productRatingDto.getRating());
         productRepository.addRating(productRatingDto.getProductId(), productRatingDto.getRating());
-        return null;
+        return ResponseEntity.ok().build();
     }
 }

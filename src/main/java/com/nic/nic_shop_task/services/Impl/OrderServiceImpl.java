@@ -44,7 +44,9 @@ public class OrderServiceImpl implements OrderService {
             return ResponseEntity.status(404).body("User not found");
         }
 
-        productService.checkAndReduceProductQuantity(cells);
+        ResponseEntity<?> response = productService.checkAndReduceProductQuantity(cells);
+
+        if (response != null) return response;
 
         Order order = orderRepository.save(new Order(
                 null,

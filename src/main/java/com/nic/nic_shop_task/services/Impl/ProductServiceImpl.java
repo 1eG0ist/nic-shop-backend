@@ -84,17 +84,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
-    public void checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells) throws NoSuchElementException, IllegalArgumentException {
+    public ResponseEntity<?> checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells) throws NoSuchElementException, IllegalArgumentException {
         for (CellWithOutOrderDto cell : cells) {
             Product product = productRepository.findById(cell.getProductId())
                     .orElseThrow(() -> new NoSuchElementException(String.format("Product not found with id %d ", cell.getProductId())));
 
             if (product.getCount() == 0) {
-                throw new IllegalArgumentException(String.format("No product %s with an id %d in the warehouses",
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format(
+                        "No product %s with an id %d in the warehouses",
                         product.getName(),
                         product.getId()));
             } else if (product.getCount() < cell.getCount()) {
-                throw new IllegalArgumentException(String.format(
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format(
                         "Have only %d products %s out of %d",
                         product.getCount(),
                         product.getName(),
@@ -104,6 +105,8 @@ public class ProductServiceImpl implements ProductService {
             product.setCount(product.getCount() - cell.getCount());
             productRepository.save(product);
         }
+
+        return null;
     }
 
     @Override
@@ -115,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
     @Modifying
     @Override
     public ResponseEntity<?> createProductS(Product product) {
-        return ResponseEntity.ok().body(productRepository.save(product));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productRepository.save(product));
     }
 
     @Transactional

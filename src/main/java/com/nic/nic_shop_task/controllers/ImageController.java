@@ -20,6 +20,9 @@ public class ImageController {
         return imageService.downloadFile(path);
     }
 
+    /*
+    * now only 2 category exists - products, categories
+    * */
     @PostMapping("/{category}")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("category") String category) {
         return imageService.uploadFile(file, category);

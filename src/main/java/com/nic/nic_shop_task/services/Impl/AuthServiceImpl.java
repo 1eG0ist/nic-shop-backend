@@ -2,10 +2,11 @@ package com.nic.nic_shop_task.services.Impl;
 
 import com.nic.nic_shop_task.configs.MyUserDetails;
 import com.nic.nic_shop_task.dtos.AuthRequestDto;
+import com.nic.nic_shop_task.dtos.AuthResponseDto;
 import com.nic.nic_shop_task.dtos.JwtResponseDto;
 import com.nic.nic_shop_task.dtos.RegistrationUserDto;
-import com.nic.nic_shop_task.models.User;
 import com.nic.nic_shop_task.models.RefreshToken;
+import com.nic.nic_shop_task.models.User;
 import com.nic.nic_shop_task.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 
@@ -42,8 +41,8 @@ public class AuthServiceImpl implements AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
             );
-            Map<String, Object> response = getTokens(authRequest.getEmail());
-            response.put("user", user);
+            AuthResponseDto response = getTokens(authRequest.getEmail());
+            response.setUser(user.get());
 
             return ResponseEntity.ok(response);
         } catch (AuthenticationException ex) {
@@ -65,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
                 }).orElse(ResponseEntity.badRequest().build());
     }
 
-    public Map<String, Object> getTokens(String email) {
+    public AuthResponseDto getTokens(String email) {
         MyUserDetails userDetails = userService.findByEmail(email);
         Optional<RefreshToken> refreshTokenCheck = refreshTokenService.findByUserId(userDetails.getId());
         if (refreshTokenCheck.isPresent()) {
@@ -74,20 +73,20 @@ public class AuthServiceImpl implements AuthService {
                     .map(RefreshToken::getUser)
                     .map(userInfo -> {
                         String accessToken = accessTokenService.generateToken(userService.findByEmail(userInfo.getEmail()));
-                        Map<String, Object> response = new HashMap<>();
-                        response.put("accessToken", accessToken);
-                        response.put("refreshToken", refreshTokenCheck.get().getToken());
-                        response.put("userId", userDetails.getId());
+                        AuthResponseDto response = new AuthResponseDto();
+                        response.setAccessToken(accessToken);
+                        response.setRefreshToken(refreshTokenCheck.get().getToken());
+                        response.setUserId(userDetails.getId());
                         return response;
-                    }).orElse(new HashMap<>());
+                    }).orElse(new AuthResponseDto());
         }
         // TODO check if refresh token exist return them
         String accessToken = accessTokenService.generateToken(userDetails);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", accessToken);
-        response.put("refreshToken", refreshToken.getToken());
-        response.put("userId", userDetails.getId());
+        AuthResponseDto response = new AuthResponseDto();
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken.getToken());
+        response.setUserId(userDetails.getId());
         return response;
     }
 
@@ -105,8 +104,8 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(registrationUserDto.getEmail(), registrationUserDto.getPassword())
         );
 
-        Map<String, Object> response = getTokens(user.getEmail());
-        response.put("user", user);
+        AuthResponseDto response = getTokens(user.getEmail());
+        response.setUser(user);
 
         return ResponseEntity.ok(response);
     }
