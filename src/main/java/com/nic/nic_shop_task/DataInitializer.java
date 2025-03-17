@@ -26,8 +26,15 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        initializeRoles();
-        initializeMinimalData();
+        if (needInitializeStartDataInDb()) {
+            initializeRoles();
+            initializeMinimalData();
+        }
+    }
+
+    private boolean needInitializeStartDataInDb() {
+        long roles = roleRepository.count();
+        return roles == 0;
     }
 
     private void initializeRoles() {

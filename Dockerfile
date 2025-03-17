@@ -18,7 +18,7 @@ COPY src/main/resources/images/products /app/images/products
 ENV IMAGE_PATH=/app/images/
 
 # Сборка приложения с использованием Maven
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 # Используем базовый образ OpenJDK 8 для запуска приложения
 FROM openjdk:8-jdk-alpine

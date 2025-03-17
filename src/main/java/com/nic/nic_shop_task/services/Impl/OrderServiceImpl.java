@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public ResponseEntity<?> createOrderS(List<CellWithOutOrderDto> cells) {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         User user = userRepository.findUserById(userId).orElse(null);

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Optional;
@@ -56,7 +57,8 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     public ResponseEntity<?> getProductCommentsByProductId(Long productId, Integer minRating, Integer maxRating, Integer page) {
         try {
             Pageable pageable = PageRequest.of(page, 10);
-            Page<ProductComment> comments = productCommentRepository.findPageByProductIdWithFiltering(productId, minRating, maxRating, pageable);
+            Page<ProductComment> comments = productCommentRepository
+                    .findPageByProductIdWithFiltering(productId, minRating, maxRating, pageable);
             return ResponseEntity.ok(comments);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -64,10 +66,13 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> deleteProductCommentById(Long productCommentId) {
         try {
             Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
-            if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            if (!comment.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
             String path = comment.get().getImagePath();
             productCommentRepository.delete(comment.get());
             if (path != null) {
@@ -80,10 +85,13 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> deleteProductCommentImageByProductId(Long productCommentId) {
         try {
             Optional<ProductComment> comment = productCommentRepository.findById(productCommentId);
-            if (!comment.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            if (!comment.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
             String path = comment.get().getImagePath();
             comment.get().setImagePath(null);
             productCommentRepository.save(comment.get());
