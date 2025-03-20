@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProductCommentRepository extends JpaRepository<ProductComment, Long> {
 
@@ -19,4 +21,6 @@ public interface ProductCommentRepository extends JpaRepository<ProductComment, 
             @Param("minRating") Integer minRating,
             @Param("maxRating") Integer maxRating,
             Pageable pageable);
+
+    List<ProductComment> findByProductId(Long productId);
 }

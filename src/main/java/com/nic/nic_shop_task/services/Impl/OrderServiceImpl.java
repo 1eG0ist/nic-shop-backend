@@ -12,7 +12,6 @@ import com.nic.nic_shop_task.services.EmailService;
 import com.nic.nic_shop_task.services.OrderService;
 import com.nic.nic_shop_task.services.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,27 +28,19 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final ProductService productService;
-
     private final OrderCellRepository orderCellRepository;
-
     private final EmailService emailService;
-
     private final UserRepository userRepository;
 
     @Override
     @Transactional
-    public ResponseEntity<?> createOrderS(List<CellWithOutOrderDto> cells) {
+    public Order createOrder(List<CellWithOutOrderDto> cells) throws Exception {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
-        User user = userRepository.findUserById(userId).orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(404).body("User not found");
-        }
+        User user = userRepository.findUserById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with ID " + userId + " not found"));
 
-        ResponseEntity<?> response = productService.checkAndReduceProductQuantity(cells);
-
-        if (response != null) return response;
+        productService.checkAndReduceProductQuantity(cells);
 
         Order order = orderRepository.save(new Order(
                 null,
@@ -75,15 +67,15 @@ public class OrderServiceImpl implements OrderService {
                 generateOrderInfo(cells, products)
         );
 
-        return ResponseEntity.ok(order);
+        return order;
     }
 
-    public static String generateOrderInfo(List<CellWithOutOrderDto> cells, List<Product> products) {
+    private static String generateOrderInfo(List<CellWithOutOrderDto> cells, List<Product> products) {
         Map<Long, Integer> productCountMap = cells.stream()
                 .collect(Collectors.toMap(CellWithOutOrderDto::getProductId, CellWithOutOrderDto::getCount));
 
         StringBuilder orderInfo = new StringBuilder();
-        Double sum = 0.0;
+        double sum = 0.0;
         for (Product product : products) {
             int count = productCountMap.getOrDefault(product.getId(), 0);
             double totalPrice = product.getPrice() * count;
@@ -96,9 +88,7 @@ public class OrderServiceImpl implements OrderService {
                     .append("\n");
         }
 
-        orderInfo
-                .append("Сумма: ")
-                .append(sum);
+        orderInfo.append("Сумма: ").append(sum);
 
         return orderInfo.toString();
     }

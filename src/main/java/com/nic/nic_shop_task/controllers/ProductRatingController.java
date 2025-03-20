@@ -18,7 +18,12 @@ public class ProductRatingController {
 
     @PostMapping
     ResponseEntity<?> addProductRating(@RequestBody ProductRatingDto productRatingDto) {
-        return productRatingService.addProductRatingS(productRatingDto);
+        try {
+            productRatingService.addProductRatingS(productRatingDto);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

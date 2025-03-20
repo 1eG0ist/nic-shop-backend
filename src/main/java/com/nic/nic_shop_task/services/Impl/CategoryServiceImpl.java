@@ -7,12 +7,11 @@ import com.nic.nic_shop_task.repositories.ProductRepository;
 import com.nic.nic_shop_task.services.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -22,23 +21,23 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductRepository productRepository;
 
     @Override
-    public ResponseEntity<List<Category>> getCategoriesTreeS() {
+    public List<Category> getCategoriesTreeS() {
         List<Category> rootCategories = categoryRepository.findRootCategories();
 
-        //TODO recursive is a bad practice, rework in future with native sql queries
+        //TODO: recursive is a bad practice, rework in future with native SQL queries
         for (Category rootCategory : rootCategories) {
             fillChildren(rootCategory);
         }
 
-        return ResponseEntity.ok(rootCategories);
+        return rootCategories;
     }
 
-    // recursive finding child categories
+    // Recursive finding child categories
     private void fillChildren(Category category) {
         List<Category> children = categoryRepository.findChildrenByParentIdWithOutParent(category.getId());
 
-        // stop infinity recursive
-        for (Category el: children) {
+        // Stop infinite recursion
+        for (Category el : children) {
             el.setParentCategory(null);
         }
 
@@ -50,55 +49,53 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<?> getDefaultCategoriesS() {
-        return ResponseEntity.ok(categoryRepository.findAll());
+    public List<Category> getDefaultCategoriesS() {
+        return categoryRepository.findAll();
     }
 
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<Category> createCategoryS(Category category) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryRepository.save(category));
+    public Category createCategoryS(Category category) {
+        return categoryRepository.save(category);
     }
 
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> updateCategoryS(UpdateCategoryDto category) {
+    public void updateCategoryS(UpdateCategoryDto category) {
         categoryRepository.updateCategory(category.getId(), category.getName());
-        return ResponseEntity.ok().build();
     }
 
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> deleteCategorySafeS(Long id) {
+    public Optional<Category> deleteCategorySafeS(Long id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         if (!optionalCategory.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return Optional.empty();
         }
 
-        Category parentCategory = optionalCategory.get().getParentCategory();
+        Category category = optionalCategory.get();
+        Category parentCategory = category.getParentCategory();
 
         if (parentCategory == null) {
-            productRepository.deleteCategoryFromProducts(optionalCategory.get().getId());
-            categoryRepository.swapCategoriesToRootCategories(optionalCategory.get().getId());
+            productRepository.deleteCategoryFromProducts(category.getId());
+            categoryRepository.swapCategoriesToRootCategories(category.getId());
         } else {
-            productRepository.swapCategoryToDeletedCategoryParent(
-                    optionalCategory.get().getId(), parentCategory.getId());
-            categoryRepository.updateParentCategories(
-                    optionalCategory.get().getId(), parentCategory.getId());
+            productRepository.swapCategoryToDeletedCategoryParent(category.getId(), parentCategory.getId());
+            categoryRepository.updateParentCategories(category.getId(), parentCategory.getId());
         }
-        categoryRepository.deleteById(optionalCategory.get().getId());
 
-        return ResponseEntity.ok().build();
+        categoryRepository.deleteById(category.getId());
+
+        return Optional.of(category);
     }
 
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> updateCategoryParentS(Long categoryId, Long newParentId) {
+    public void updateCategoryParentS(Long categoryId, Long newParentId) {
         categoryRepository.updateCategoryParent(categoryId, newParentId);
-        return ResponseEntity.ok().build();
     }
 }

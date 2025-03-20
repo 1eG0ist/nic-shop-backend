@@ -3,6 +3,8 @@ package com.nic.nic_shop_task.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,6 +30,7 @@ public class Product {
     private Integer sumOfRatings = 0;
 
     @ManyToMany
+    @OnDelete(action= OnDeleteAction.CASCADE)
     @JoinTable(
             name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),

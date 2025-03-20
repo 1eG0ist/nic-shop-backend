@@ -10,8 +10,6 @@ import com.nic.nic_shop_task.models.User;
 import com.nic.nic_shop_task.services.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -31,37 +30,34 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
 
-    public ResponseEntity<?> authTokensForLogin(@RequestBody AuthRequestDto authRequest) {
+    public AuthResponseDto authTokensForLogin(@RequestBody AuthRequestDto authRequest)
+            throws NoSuchElementException, AuthenticationException {
         Optional<User> user = userService.existsByEmail(authRequest.getEmail());
         if (!user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User does not exist");
+            throw new NoSuchElementException("User does not exist");
         }
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-            );
-            AuthResponseDto response = getTokens(authRequest.getEmail());
-            response.setUser(user.get());
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+        );
+        AuthResponseDto response = getTokens(authRequest.getEmail());
+        response.setUser(user.get());
 
-            return ResponseEntity.ok(response);
-        } catch (AuthenticationException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong login or password");
-        }
+        return response;
     }
 
 
-    public ResponseEntity<?> createTokensByRefreshToken(String token){
+    public JwtResponseDto createTokensByRefreshToken(String token) {
         return refreshTokenService.findByToken(token)
                 .flatMap(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(userInfo -> {
                     String accessToken = accessTokenService.generateToken(userService.findByEmail(userInfo.getEmail()));
-                    return ResponseEntity.ok(JwtResponseDto.builder()
+                    return JwtResponseDto.builder()
                             .accessToken(accessToken)
                             .refreshToken(token)
-                            .user(userService.existsByEmail(userInfo.getEmail()).get()).build());
-                }).orElse(ResponseEntity.badRequest().build());
+                            .user(userService.existsByEmail(userInfo.getEmail()).get()).build();
+                }).orElseThrow(() -> new RuntimeException("Create tokens failed"));
     }
 
     public AuthResponseDto getTokens(String email) {
@@ -92,9 +88,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Modifying
-    public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {
+    public AuthResponseDto createNewUser(@RequestBody RegistrationUserDto registrationUserDto) throws Exception {
         if (userService.findByEmail(registrationUserDto.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User with this email already exists");
+            throw new Exception("User with this email already exists");
         }
 
         User user = userService.createNewUser(registrationUserDto);
@@ -107,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
         AuthResponseDto response = getTokens(user.getEmail());
         response.setUser(user);
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 }
 

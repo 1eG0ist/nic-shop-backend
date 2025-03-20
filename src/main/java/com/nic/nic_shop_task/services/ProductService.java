@@ -3,30 +3,26 @@ package com.nic.nic_shop_task.services;
 import com.nic.nic_shop_task.dtos.CellWithOutOrderDto;
 import com.nic.nic_shop_task.dtos.FilterPropertyDto;
 import com.nic.nic_shop_task.models.Product;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public interface ProductService {
-    ResponseEntity<?> getProductsS(
+    Page<Product> getProducts(
             Long categoryId,
             String sort,
             Double minRating,
             Double maxRating,
             Integer page,
             List<FilterPropertyDto> filterProperties);
-
-    ResponseEntity<Product> getProductS(Long productId);
-
-    ResponseEntity<Integer> checkProductsCountS(Long productId);
-
-    ResponseEntity<?> checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells);
-
+    Product getProduct(Long productId);
+    Integer checkProductsCount(Long productId);
+    void checkAndReduceProductQuantity(List<CellWithOutOrderDto> cells)
+            throws Exception, NoSuchElementException, IllegalArgumentException;
     List<Product> getProductsByIds(List<Long> ids);
-
-    ResponseEntity<?> createProductS(Product product);
-
-    ResponseEntity<?> updateProductS(Product product);
-
-    ResponseEntity<?> deleteProduct(Long id);
+    Product createProduct(Product product);
+    Product updateProduct(Product product);
+    void deleteProduct(Long id) throws IOException;
 }

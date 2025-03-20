@@ -16,16 +16,31 @@ public class ProductPropertiesController {
 
     @PostMapping
     public ResponseEntity<?> createProductProperty(@RequestBody ProductPropertyDto productPropertyDto) {
-        return productPropertiesService.createProductPropertyS(productPropertyDto);
+        try {
+            ProductProperties createdProductProperties = productPropertiesService.createProductPropertyS(productPropertyDto);
+            return ResponseEntity.ok(createdProductProperties);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @PatchMapping
     public ResponseEntity<?> updateProductProperty(@RequestBody ProductProperties productProperties) {
-        return productPropertiesService.updateProductPropertyS(productProperties);
+        try {
+            ProductProperties updatedProductProperties = productPropertiesService.updateProductPropertyS(productProperties);
+            return ResponseEntity.ok(updatedProductProperties);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteProductProperty(@RequestParam("id") Long id) {
-        return productPropertiesService.deleteProductPropertyS(id);
+        try {
+            productPropertiesService.deleteProductPropertyS(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 }

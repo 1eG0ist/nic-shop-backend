@@ -3,10 +3,6 @@ package com.nic.nic_shop_task.services.Impl;
 import com.nic.nic_shop_task.services.ImageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,9 +32,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ResponseEntity<String> uploadFile(MultipartFile file, String category) {
+    public String uploadFile(MultipartFile file, String category) throws IOException {
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty");
+            throw new IOException("File is empty");
         }
 
         String path = filesDir + category + filesSep
@@ -46,41 +42,20 @@ public class ImageServiceImpl implements ImageService {
                 + UUID.randomUUID().toString().substring(0, 10)
                 + ".jpg";
 
-        try {
-            saveFile(file, path);
-            return ResponseEntity.ok(path);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Failed to upload file: " + e.getMessage());
-        }
+        saveFile(file, path);
+        return path;
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> downloadFile(String filePath) {
-        try {
-            File file = Paths.get(filePath).toFile();
-            if (!file.exists()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-            InputStreamResource resource = new InputStreamResource(Files.newInputStream(file.toPath()));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
-            if (filePath.contains(".png")) {
-                headers.setContentType(MediaType.IMAGE_PNG);
-            }
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(file.length())
-                    .body(resource);
-
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    public InputStreamResource downloadFile(String filePath) throws IOException {
+        File file = Paths.get(filePath).toFile();
+        if (!file.exists()) {
+            return null;
         }
+        return new InputStreamResource(Files.newInputStream(file.toPath()));
     }
 
-    @Override
-    public ResponseEntity<?> deleteFiles(List<String> filesToDelete) {
+    public void deleteFiles(List<String> filesToDelete) throws IOException {
         List<File> successfullyDeletedFiles = new ArrayList<>();
 
         try {
@@ -91,10 +66,9 @@ public class ImageServiceImpl implements ImageService {
                     successfullyDeletedFiles.add(file);
                 }
             }
-            return ResponseEntity.ok("Files deleted successfully.");
-        } catch (Exception e) {
+        } catch (IOException e) {
             rollbackFiles(successfullyDeletedFiles);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete files: " + e.getMessage());
+            throw e;
         }
     }
 

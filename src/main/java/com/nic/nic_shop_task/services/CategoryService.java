@@ -2,18 +2,20 @@ package com.nic.nic_shop_task.services;
 
 import com.nic.nic_shop_task.dtos.categories.UpdateCategoryDto;
 import com.nic.nic_shop_task.models.Category;
-import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface CategoryService {
-    ResponseEntity<?> getCategoriesTreeS();
+    List<Category> getCategoriesTreeS();
 
-    ResponseEntity<?> getDefaultCategoriesS();
+    List<Category> getDefaultCategoriesS();
 
-    ResponseEntity<Category> createCategoryS(Category category);
+    Category createCategoryS(Category category);
 
-    ResponseEntity<?> updateCategoryS(UpdateCategoryDto category);
+    void updateCategoryS(UpdateCategoryDto category);
 
-    ResponseEntity<?> deleteCategorySafeS(Long id);
+    Optional<Category> deleteCategorySafeS(Long id);
 
-    ResponseEntity<?> updateCategoryParentS(Long categoryId, Long newParentId);
+    void updateCategoryParentS(Long categoryId, Long newParentId);
 }

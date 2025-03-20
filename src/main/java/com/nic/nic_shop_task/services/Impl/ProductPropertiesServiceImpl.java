@@ -10,8 +10,6 @@ import com.nic.nic_shop_task.repositories.PropertyRepository;
 import com.nic.nic_shop_task.services.ProductPropertiesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,18 +21,15 @@ public class ProductPropertiesServiceImpl implements ProductPropertiesService {
     private final ProductPropertiesRepository productPropertiesRepository;
     private final PropertyRepository propertyRepository;
     private final ProductRepository productRepository;
+
     @Override
     @Transactional
-    public ResponseEntity<?> createProductPropertyS(ProductPropertyDto productPropertyDto) {
-        Property property;
-        if (productPropertyDto.getProperty().getId() == null) {
-            property = propertyRepository.save(productPropertyDto.getProperty());
-        } else {
-            property = productPropertyDto.getProperty();
-        }
-
+    public ProductProperties createProductPropertyS(ProductPropertyDto productPropertyDto) throws RuntimeException {
+        Property property = getOrCreateProperty(productPropertyDto);
         Optional<Product> product = productRepository.findById(productPropertyDto.getProductId());
-        if (!product.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (!product.isPresent()) {
+            throw new RuntimeException("Product not found");
+        }
 
         ProductProperties productProperties = new ProductProperties(
                 null,
@@ -47,22 +42,30 @@ public class ProductPropertiesServiceImpl implements ProductPropertiesService {
                 productPropertyDto.getTextValue()
         );
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(productPropertiesRepository.save(productProperties));
+        return productPropertiesRepository.save(productProperties);
     }
 
     @Override
-    public ResponseEntity<?> updateProductPropertyS(ProductProperties productProperties) {
-        productPropertiesRepository.save(productProperties);
-        return ResponseEntity.ok().build();
+    @Modifying
+    public ProductProperties updateProductPropertyS(ProductProperties productProperties) {
+        return productPropertiesRepository.save(productProperties);
     }
 
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> deleteProductPropertyS(Long id) {
+    public void deleteProductPropertyS(Long id) throws RuntimeException {
+        if (!productPropertiesRepository.existsById(id)) {
+            throw new RuntimeException("No product properties with this id");
+        }
         productPropertiesRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+    }
+
+    private Property getOrCreateProperty(ProductPropertyDto productPropertyDto) {
+        if (productPropertyDto.getProperty().getId() == null) {
+            return propertyRepository.save(productPropertyDto.getProperty());
+        } else {
+            return productPropertyDto.getProperty();
+        }
     }
 }

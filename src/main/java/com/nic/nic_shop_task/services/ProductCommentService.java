@@ -1,12 +1,14 @@
 package com.nic.nic_shop_task.services;
 
-
 import com.nic.nic_shop_task.dtos.CreateProductCommentDto;
-import org.springframework.http.ResponseEntity;
+import com.nic.nic_shop_task.models.ProductComment;
+
+import java.io.IOException;
+import java.util.List;
 
 public interface ProductCommentService {
-    ResponseEntity<?> createProductCommentS(CreateProductCommentDto createProductCommentDto);
-    ResponseEntity<?> getProductCommentsByProductId(Long productId, Integer minRating, Integer maxRating, Integer page);
-    ResponseEntity<?> deleteProductCommentById(Long productCommentId);
-    ResponseEntity<?> deleteProductCommentImageByProductId(Long productCommentId);
+    ProductComment createProductComment(CreateProductCommentDto createProductCommentDto);
+    List<ProductComment> getProductCommentsByProductId(Long productId, Integer minRating, Integer maxRating, Integer page);
+    void deleteProductCommentById(Long productCommentId) throws IOException;
+    void deleteProductCommentImageByProductId(Long productCommentId) throws IOException;
 }

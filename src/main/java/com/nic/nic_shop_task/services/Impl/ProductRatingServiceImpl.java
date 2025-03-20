@@ -6,7 +6,6 @@ import com.nic.nic_shop_task.repositories.ProductRepository;
 import com.nic.nic_shop_task.services.ProductRatingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +19,9 @@ public class ProductRatingServiceImpl implements ProductRatingService {
     @Override
     @Transactional
     @Modifying
-    public ResponseEntity<?> addProductRatingS(ProductRatingDto productRatingDto) {
+    public void addProductRatingS(ProductRatingDto productRatingDto) {
         Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         productRatingRepository.saveNewRating(userId, productRatingDto.getProductId(), productRatingDto.getRating());
         productRepository.addRating(productRatingDto.getProductId(), productRatingDto.getRating());
-        return ResponseEntity.ok().build();
     }
 }

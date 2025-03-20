@@ -1,14 +1,13 @@
 package com.nic.nic_shop_task.services;
 
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ImageService {
-    ResponseEntity<InputStreamResource> downloadFile(String filePath);
-    ResponseEntity<String> uploadFile(MultipartFile file, String category);
-    ResponseEntity<?> deleteFiles(List<String> filesToDelete);
-
+    InputStreamResource downloadFile(String filePath) throws IOException;
+    String uploadFile(MultipartFile file, String category) throws IOException;
+    void deleteFiles(List<String> filesToDelete) throws IOException;
 }
